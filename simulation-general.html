@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTRA - General Mode Simulation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b132b;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle at center, #1c2541 0%, #0b132b 100%);
+            border: 1px solid #3a506b;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            cursor: grab;
+        }
+        .canvas-container:active {
+            cursor: grabbing;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </a>
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-earth-asia text-cyan-400 text-xl"></i>
+                <h1 class="text-xl font-bold tracking-wide text-white">ASTRA <span class="text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded ml-2">GENERAL MODE</span></h1>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="text-right hidden sm:block">
+                <p class="text-xs text-slate-400">General Mode</p>
+                <p id="active-user-badge" class="text-sm font-mono font-bold text-cyan-400">DRDO-8492</p>
+            </div>
+            <a href="dashboard.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-sm border border-slate-700 transition-colors flex items-center space-x-2">
+                <i class="fa-solid fa-chart-line text-emerald-400"></i>
+                <span>Dashboard</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workbench Area -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 p-6 max-w-[1800px] w-full mx-auto">
+
+        <!-- Left Column: Controls & Dynamic Calculations -->
+        <div class="lg:col-span-1 space-y-6 flex flex-col">
+            
+            <!-- Deployment Sector Selector -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                    <span><i class="fa-solid fa-location-crosshairs text-cyan-400 mr-2"></i>Deployment Zone</span>
+                    <span class="text-xs bg-cyan-950 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded">INTERACTIVE</span>
+                </h2>
+                
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Select Preset Region</label>
+                    <select id="preset-select" onchange="applyPresetRegion()" class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500 font-mono">
+                        <option value="ladakh" selected>Sector 4 - Eastern Ladakh (-28°C)</option>
+                        <option value="siachen">Siachen Base Camp (-35°C)</option>
+                        <option value="tawang">Tawang Pass (-15°C)</option>
+                        <option value="drass">Drass Sector (-40°C)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-3 pt-2 font-mono text-xs">
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>External Ambient Temp:</span>
+                            <span id="ambient-val" class="text-rose-400 font-bold">-28 °C</span>
+                        </div>
+                        <input type="range" id="ambient-slider" min="-50" max="10" value="-28" oninput="updateSimulation()" class="w-full accent-rose-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>Target Living Temp:</span>
+                            <span id="target-val" class="text-emerald-400 font-bold">+18 °C</span>
+                        </div>
+                        <input type="range" id="target-slider" min="10" max="25" value="18" oninput="updateSimulation()" class="w-full accent-emerald-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>Aerogel Insulation Thickness:</span>
+                            <span id="aerogel-val" class="text-amber-400 font-bold">25 mm</span>
+                        </div>
+                        <input type="range" id="aerogel-slider" min="10" max="60" value="25" oninput="updateSimulation()" class="w-full accent-amber-500 bg-slate-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Environmental Performance & Impact Outputs -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                    <span><i class="fa-solid fa-leaf text-emerald-400 mr-2"></i>Sustainability Impact</span>
+                    <i class="fa-solid fa-bolt text-xs text-amber-400"></i>
+                </h2>
+
+                <div class="grid grid-cols-2 gap-3 font-mono">
+                    <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60">
+                        <p class="text-[10px] text-slate-400 uppercase">Thermal Load</p>
+                        <p id="calc-heat-loss" class="text-sm font-bold text-cyan-400 mt-1">1.82 kW</p>
+                    </div>
+
+                    <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60">
+                        <p class="text-[10px] text-slate-400 uppercase">Energy Efficiency</p>
+                        <p id="calc-efficiency" class="text-sm font-bold text-emerald-400 mt-1">84.2%</p>
+                    </div>
+
+                    <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60">
+                        <p class="text-[10px] text-slate-400 uppercase">Fuel Saved / Day</p>
+                        <p id="calc-fuel-saved" class="text-sm font-bold text-amber-400 mt-1">28.4 L</p>
+                    </div>
+
+                    <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60">
+                        <p class="text-[10px] text-slate-400 uppercase">CO₂ Offset / Month</p>
+                        <p id="calc-co2-offset" class="text-sm font-bold text-emerald-400 mt-1">2.14 Tons</p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-800/40 border border-slate-700/60 text-xs text-slate-300 leading-relaxed">
+                    <p id="eco-summary"><i class="fa-solid fa-circle-info text-cyan-400 mr-1.5"></i>Passive PCM heat absorption reduces active diesel heating consumption by up to <strong class="text-white">68%</strong> in current conditions.</p>
+                </div>
+            </div>
+
+            <!-- Material Composition Summary -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-lg space-y-3">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                    <span><i class="fa-solid fa-layer-group text-purple-400 mr-2"></i>Habitat Composite</span>
+                    <i class="fa-solid fa-cube text-xs text-purple-400"></i>
+                </h2>
+                
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between items-center p-2 rounded bg-slate-800/50">
+                        <span class="text-slate-300"><i class="fa-solid fa-square text-cyan-400 mr-2"></i>Carbon-Aramid Outer Shell</span>
+                        <span class="font-mono text-cyan-400">5 mm</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded bg-slate-800/50">
+                        <span class="text-slate-300"><i class="fa-solid fa-square text-pink-500 mr-2"></i>PCM Thermal Core Layer</span>
+                        <span class="font-mono text-pink-400">12 mm</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded bg-slate-800/50">
+                        <span class="text-slate-300"><i class="fa-solid fa-square text-amber-400 mr-2"></i>Silica Aerogel Barrier</span>
+                        <span id="aerogel-spec-val" class="font-mono text-amber-400">25 mm</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded bg-slate-800/50">
+                        <span class="text-slate-300"><i class="fa-solid fa-square text-emerald-400 mr-2"></i>Al-Li Structural Frame</span>
+                        <span class="font-mono text-emerald-400">30 mm</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Interactive 3D Canvas -->
+        <div class="lg:col-span-3 flex flex-col space-y-4">
+            
+            <div class="canvas-container flex-1 min-h-[640px] relative">
+                
+                <!-- Interactive Controls Overlay -->
+                <div class="absolute top-4 left-4 z-10 flex space-x-2">
+                    <button onclick="toggleExplodedView()" id="explode-btn" class="bg-slate-900/90 hover:bg-slate-800 text-cyan-400 border border-cyan-500/40 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Explode Structure</span>
+                    </button>
+                    <button onclick="toggleLabels()" id="labels-btn" class="bg-slate-900/90 hover:bg-slate-800 text-emerald-400 border border-emerald-500/40 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-tags"></i>
+                        <span>Toggle Labels</span>
+                    </button>
+                    <button onclick="resetView()" class="bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-lg flex items-center space-x-1">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Reset Angle</span>
+                    </button>
+                </div>
+
+                <div class="absolute top-4 right-4 z-10 bg-slate-900/80 border border-slate-800 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs font-mono text-slate-400 flex items-center space-x-2 pointer-events-none">
+                    <i class="fa-solid fa-arrows-spin text-cyan-400"></i>
+                    <span>Drag: Rotate | Scroll: Zoom</span>
+                </div>
+
+                <canvas id="canvas-3d"></canvas>
+
+                <!-- Dynamic Thermal Gradient Legend -->
+                <div class="absolute bottom-4 left-4 z-10 bg-slate-900/80 border border-slate-800 backdrop-blur-sm px-4 py-2.5 rounded-lg text-xs font-mono text-slate-300 flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                        <span id="legend-ext">Ext: -28°C</span>
+                    </div>
+                    <div class="w-16 h-2 rounded bg-gradient-to-r from-blue-500 via-emerald-400 to-rose-500"></div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block"></span>
+                        <span id="legend-int">Int: +18°C</span>
+                    </div>
+                </div>
+
+                <!-- Active Status Indicator -->
+                <div class="absolute bottom-4 right-4 z-10 bg-slate-900/80 border border-slate-800 backdrop-blur-sm px-4 py-2 rounded-lg text-xs font-mono text-slate-300 flex items-center space-x-3">
+                    <span class="flex h-2 w-2 relative">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    </span>
+                    <span>General Simulation Engine Online</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Simulation JavaScript Logic -->
+    <script>
+    let canvas, ctx;
+    let angleX = 0.35, angleY = 0.55;
+    let zoomLevel = 1.0; 
+    let isDragging = false, lastMouseX = 0, lastMouseY = 0;
+    let isExploded = false;
+    let explosionProgress = 0;
+    let showLabels = true;
+
+    // Preset location data
+    const presets = {
+        ladakh: { temp: -28, target: 18, aerogel: 25 },
+        siachen: { temp: -35, target: 20, aerogel: 35 },
+        tawang: { temp: -15, target: 18, aerogel: 20 },
+        drass: { temp: -40, target: 18, aerogel: 40 }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        canvas = document.getElementById('canvas-3d');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+
+        // Mouse interaction handlers
+        canvas.addEventListener('mousedown', e => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+        
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            angleY += (e.clientX - lastMouseX) * 0.008;
+            angleX += (e.clientY - lastMouseY) * 0.008;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomLevel = Math.min(zoomLevel + 0.1, 2.5);
+            } else {
+                zoomLevel = Math.max(zoomLevel - 0.1, 0.4);
+            }
+        }, { passive: false });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        updateSimulation();
+        requestAnimationFrame(render3DScene);
+    });
+
+    function resizeCanvas() {
+        if (!canvas) return;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+
+    function applyPresetRegion() {
+        const key = document.getElementById('preset-select').value;
+        const p = presets[key];
+        if (p) {
+            document.getElementById('ambient-slider').value = p.temp;
+            document.getElementById('target-slider').value = p.target;
+            document.getElementById('aerogel-slider').value = p.aerogel;
+            updateSimulation();
+        }
+    }
+
+    function updateSimulation() {
+        const ambient = parseFloat(document.getElementById('ambient-slider').value);
+        const target = parseFloat(document.getElementById('target-slider').value);
+        const aerogel = parseFloat(document.getElementById('aerogel-slider').value);
+
+        // Update labels
+        document.getElementById('ambient-val').innerText = `${ambient} °C`;
+        document.getElementById('target-val').innerText = `+${target} °C`;
+        document.getElementById('aerogel-val').innerText = `${aerogel} mm`;
+        document.getElementById('aerogel-spec-val').innerText = `${aerogel} mm`;
+        document.getElementById('legend-ext').innerText = `Ext: ${ambient}°C`;
+        document.getElementById('legend-int').innerText = `Int: +${target}°C`;
+
+        // Physical heat loss model calculations (approximate)
+        const deltaT = target - ambient;
+        const thermalResistance = 0.8 + (aerogel * 0.06); // Insulation calculation
+        const heatLossKw = (deltaT / thermalResistance) * 0.038;
+        const efficiency = Math.min(96, Math.max(50, 100 - (heatLossKw * 14)));
+        const fuelSavedDaily = (deltaT * 0.62) * (aerogel / 20.0);
+        const co2OffsetMonthly = (fuelSavedDaily * 30 * 2.5) / 1000;
+
+        // UI Updates
+        document.getElementById('calc-heat-loss').innerText = `${heatLossKw.toFixed(2)} kW`;
+        document.getElementById('calc-efficiency').innerText = `${efficiency.toFixed(1)}%`;
+        document.getElementById('calc-fuel-saved').innerText = `${fuelSavedDaily.toFixed(1)} L`;
+        document.getElementById('calc-co2-offset').innerText = `${co2OffsetMonthly.toFixed(2)} Tons`;
+
+        document.getElementById('eco-summary').innerHTML = `<i class="fa-solid fa-circle-info text-cyan-400 mr-1.5"></i>At a <strong class="text-white">${deltaT.toFixed(0)}°C</strong> thermal differential, the ${aerogel}mm aerogel barrier prevents <strong class="text-emerald-400">${(efficiency * 0.8).toFixed(0)}%</strong> of baseline heat loss.`;
+    }
+
+    function toggleExplodedView() {
+        isExploded = !isExploded;
+        const btn = document.getElementById('explode-btn');
+        btn.innerHTML = isExploded ? 
+            '<i class="fa-solid fa-compress"></i><span>Reassemble Structure</span>' : 
+            '<i class="fa-solid fa-layer-group"></i><span>Explode Structure</span>';
+    }
+
+    function toggleLabels() {
+        showLabels = !showLabels;
+    }
+
+    function resetView() {
+        angleX = 0.35;
+        angleY = 0.55;
+        zoomLevel = 1.0;
+    }
+
+    function project3D(x, y, z) {
+        x *= zoomLevel;
+        y *= zoomLevel;
+        z *= zoomLevel;
+
+        let y1 = y * Math.cos(angleX) - z * Math.sin(angleX);
+        let z1 = y * Math.sin(angleX) + z * Math.cos(angleX);
+
+        let x2 = x * Math.cos(angleY) + z1 * Math.sin(angleY);
+        let z2 = -x * Math.sin(angleY) + z1 * Math.cos(angleY);
+
+        const fov = 380;
+        const scale = fov / (fov + z2 + 250);
+        return { x: canvas.width / 2 + x2 * scale, y: canvas.height / 2 + y1 * scale };
+    }
+
+    function render3DScene() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const targetExplosion = isExploded ? 1 : 0;
+        explosionProgress += (targetExplosion - explosionProgress) * 0.08;
+
+        const aerogelThick = document.getElementById('aerogel-slider').value;
+
+        const layers = [
+            { name: "Structural Alloy Frame", thick: "30mm", width: 100, height: 70, depth: 100, color: "rgba(74, 222, 128, 0.35)", stroke: "#4ade80", exp: 0 },
+            { name: "Aerogel Insulation", thick: `${aerogelThick}mm`, width: 130, height: 90, depth: 130, color: "rgba(251, 191, 36, 0.25)", stroke: "#fbbf24", exp: 40 },
+            { name: "PCM Latent Core", thick: "12mm", width: 160, height: 110, depth: 160, color: "rgba(247, 37, 133, 0.20)", stroke: "#f72585", exp: 80 },
+            { name: "Carbon Composite Shell", thick: "5mm", width: 190, height: 130, depth: 190, color: "rgba(76, 201, 240, 0.12)", stroke: "#4cc9f0", exp: 120 }
+        ];
+
+        layers.forEach(l => {
+            const currentExp = l.exp * explosionProgress;
+            drawWireframeCube(l.width + currentExp, l.height + currentExp, l.depth + currentExp, l.color, l.stroke, l.name, l.thick);
+        });
+
+        if (explosionProgress < 0.6) {
+            drawAirlock();
+            drawWindowPort();
+            drawEnvironmentGlow();
+        }
+
+        requestAnimationFrame(render3DScene);
+    }
+
+    function drawWireframeCube(w, h, d, fillColor, strokeColor, label, thick) {
+        const hw = w / 2, hh = h / 2, hd = d / 2;
+
+        const vertices = [
+            project3D(-hw, -hh, -hd), project3D(hw, -hh, -hd),
+            project3D(hw, hh, -hd),   project3D(-hw, hh, -hd),
+            project3D(-hw, -hh, hd),  project3D(hw, -hh, hd),
+            project3D(hw, hh, hd),    project3D(-hw, hh, hd)
+        ];
+
+        const faces = [
+            [0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4],
+            [2, 3, 7, 6], [0, 3, 7, 4], [1, 2, 6, 5]
+        ];
+
+        faces.forEach(f => {
+            ctx.beginPath();
+            ctx.moveTo(vertices[f[0]].x, vertices[f[0]].y);
+            ctx.lineTo(vertices[f[1]].x, vertices[f[1]].y);
+            ctx.lineTo(vertices[f[2]].x, vertices[f[2]].y);
+            ctx.lineTo(vertices[f[3]].x, vertices[f[3]].y);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        });
+
+        if (showLabels && (explosionProgress > 0.3 || label.includes("Carbon Composite"))) {
+            const topNode = vertices[2];
+            ctx.fillStyle = strokeColor;
+            ctx.font = "bold 11px Segoe UI, sans-serif";
+            ctx.fillText(`${label} [${thick}]`, topNode.x + 8, topNode.y - 8);
+        }
+    }
+
+    function drawAirlock() {
+        const z = 95;
+        const extZ = z + 35;
+        const ev1 = project3D(-25, 0, extZ), ev2 = project3D(25, 0, extZ);
+        const ev3 = project3D(25, 65, extZ), ev4 = project3D(-25, 65, extZ);
+
+        ctx.beginPath();
+        ctx.moveTo(ev1.x, ev1.y); ctx.lineTo(ev2.x, ev2.y);
+        ctx.lineTo(ev3.x, ev3.y); ctx.lineTo(ev4.x, ev4.y);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
+        ctx.fill();
+        ctx.strokeStyle = "#4cc9f0";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#4cc9f0";
+        ctx.font = "bold 10px monospace";
+        ctx.fillText("AIRLOCK VESTIBULE", ev1.x - 10, ev1.y - 8);
+    }
+
+    function drawWindowPort() {
+        const x = 95;
+        const w1 = project3D(x, -25, -20), w2 = project3D(x, -25, 20);
+        const w3 = project3D(x, 15, 20),   w4 = project3D(x, 15, -20);
+
+        ctx.beginPath();
+        ctx.moveTo(w1.x, w1.y); ctx.lineTo(w2.x, w2.y);
+        ctx.lineTo(w3.x, w3.y); ctx.lineTo(w4.x, w4.y);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(251, 191, 36, 0.6)";
+        ctx.fill();
+        ctx.strokeStyle = "#fbbf24";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+
+    function drawEnvironmentGlow() {
+        const center = project3D(0, 0, 0);
+        const gradient = ctx.createRadialGradient(center.x, center.y, 10, center.x, center.y, 180 * zoomLevel);
+        gradient.addColorStop(0, 'rgba(74, 222, 128, 0.08)');
+        gradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, 180 * zoomLevel, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    </script>
+</body>
+</html>

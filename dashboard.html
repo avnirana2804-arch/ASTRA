@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTRA - Service Member Access & Personnel Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        :root {
+            --bg-dark: #030712;
+            --panel-bg: rgba(15, 23, 42, 0.9);
+            --border-glow: rgba(76, 201, 240, 0.25);
+            --accent-cyan: #4cc9f0;
+            --accent-pink: #f72585;
+            --accent-green: #4ade80;
+            --accent-amber: #fbbf24;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 24px;
+        }
+
+        .dashboard-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            padding: 18px 24px;
+            border-radius: 12px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        /* Profile Card Styling */
+        .profile-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 15px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-group label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-group input, .field-group select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .field-group input:disabled, .field-group select:disabled {
+            background: transparent;
+            border-color: rgba(255,255,255,0.08);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .badge-id {
+            background: rgba(76, 201, 240, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* Activity Table */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.88rem;
+        }
+
+        .history-table th {
+            text-align: left;
+            color: var(--accent-cyan);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 10px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .history-table td {
+            padding: 14px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #e2e8f0;
+        }
+
+        .mode-tag {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .mode-expert { background: rgba(247, 37, 133, 0.15); color: var(--accent-pink); }
+        .mode-officer { background: rgba(76, 201, 240, 0.15); color: var(--accent-cyan); }
+        .mode-general { background: rgba(74, 222, 128, 0.15); color: var(--accent-green); }
+
+        .btn-edit {
+            background: rgba(76, 201, 240, 0.15);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .btn-save {
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Header Navigation -->
+    <header class="dash-header">
+        <div>
+            <span style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">ASTRA Personnel Management</span>
+            <h1 style="margin: 2px 0 0 0; font-size: 1.5rem; color: #fff;">Service ID Access & Simulation Log</h1>
+        </div>
+        <a href="index.html" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); text-decoration: none; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem;">
+            ← Return to Control Console
+        </a>
+        
+    </header>
+
+    <!-- SECTION 1: Service Member ID Configuration Card (Editable) -->
+    <div class="profile-card">
+        <div class="profile-header">
+            <div>
+                <span class="badge-id" id="display-badge-id">SERVICE ID: IC-78219</span>
+                <h2 style="margin: 8px 0 0 0; font-size: 1.3rem; color: #fff;" id="profile-title-name">Major A. Sharma</h2>
+            </div>
+            <div>
+                <button id="toggle-edit-btn" onclick="toggleEditProfile()" class="btn-edit">✎ Edit Personnel ID</button>
+            </div>
+        </div>
+
+        <form id="profile-form" onsubmit="saveProfile(event)">
+            <div class="profile-grid">
+                <div class="field-group">
+                    <label>Personnel ID (DRDO)</label>
+                    <input type="text" id="user-personnel-id" value="DRDO-8492" disabled required>
+                </div>
+                <div class="field-group">
+                    <label>Service ID / Roll No</label>
+                    <input type="text" id="user-id" value="IC-78219" disabled required>
+                </div>
+                <div class="field-group">
+                    <label>Full Name</label>
+                    <input type="text" id="user-name" value="Major A. Sharma" disabled required>
+                </div>
+                <div class="field-group">
+                    <label>Rank / Designation / Post</label>
+                    <input type="text" id="user-post" value="Field Operations Commander" disabled required>
+                </div>
+                <div class="field-group">
+                    <label>Assigned Sector / Base</label>
+                    <input type="text" id="user-base" value="Sector 4 - Eastern Ladakh" disabled required>
+                </div>
+                <div class="field-group">
+                    <label>Security Clearance Level</label>
+                    <select id="user-clearance" disabled>
+                        <option value="Level-1 Operational">Level-1 Operational</option>
+                        <option value="Level-2 Logistics">Level-2 Logistics</option>
+                        <option value="Level-3 Tactical Command" selected>Level-3 Tactical Command</option>
+                        <option value="Level-4 Sector Command">Level-4 Sector Command</option>
+                        <option value="Level-5 Central Command">Level-5 Central Command</option>
+                        <option value="Confidential">Confidential</option>
+                        <option value="Secret">Secret</option>
+                        <option value="Top Secret / SCI">Top Secret / SCI</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- SECTION 2: Personal Simulation Search History -->
+    <div class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem; color: var(--accent-cyan);">Personal Simulation & Search Logs</h3>
+                <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #94a3b8;">Record of thermal calculations executed under this specific Service ID.</p>
+            </div>
+            <button onclick="clearUserHistory()" style="background: transparent; border: 1px solid rgba(247,37,133,0.4); color: var(--accent-pink); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">Clear History Log</button>
+        </div>
+
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Timestamp (Date & Time)</th>
+                    <th>Mode Used</th>
+                    <th>Target Sector Location</th>
+                    <th>Troop Capacity</th>
+                    <th>Duration of Operation</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="history-rows">
+                <!-- Rows loaded dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+let isEditing = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProfile();
+    loadSimulationHistory();
+});
+
+// Load Profile Info from LocalStorage
+function loadProfile() {
+    const savedProfile = JSON.parse(localStorage.getItem('astra_user_id') || JSON.stringify({
+        personnelId: 'DRDO-8492',
+        id: 'IC-78219',
+        name: 'Major A. Sharma',
+        post: 'Field Operations Commander',
+        base: 'Sector 4 - Eastern Ladakh',
+        clearance: 'Level-3 Tactical Command'
+    }));
+    const activeUser = JSON.parse(localStorage.getItem('astra_active_user')) || {
+    personnelId: 'DRDO-8492',
+    email: 'officer@drdo.in'
+};
+
+// Set the input field value to the active DRDO ID
+document.getElementById('user-personnel-id').value = activeUser.personnelId;
+
+// Load simulation history tied specifically to this DRDO ID
+const historyKey = `astra_history_${activeUser.personnelId}`;
+const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+
+    document.getElementById('user-id').value = savedProfile.id;
+    document.getElementById('user-name').value = savedProfile.name;
+    document.getElementById('user-post').value = savedProfile.post;
+    document.getElementById('user-base').value = savedProfile.base;
+    document.getElementById('user-clearance').value = savedProfile.clearance;
+
+    document.getElementById('display-badge-id').innerText = `SERVICE ID: ${savedProfile.id}`;
+    document.getElementById('profile-title-name').innerText = `${savedProfile.name} (${savedProfile.post})`;
+}
+
+// Toggle Profile Fields Between View and Edit Modes
+function toggleEditProfile() {
+    const fields = ['user-id', 'user-name', 'user-post', 'user-base', 'user-clearance'];
+    const editBtn = document.getElementById('toggle-edit-btn');
+
+    if (!isEditing) {
+        fields.forEach(id => document.getElementById(id).disabled = false);
+        editBtn.innerText = '✓ Save Profile Changes';
+        editBtn.className = 'btn-save';
+        isEditing = true;
+    } else {
+        saveProfile();
+    }
+}
+
+// Save Profile Info to LocalStorage
+function saveProfile() {
+    const profileData = {
+        id: document.getElementById('user-id').value,
+        name: document.getElementById('user-name').value,
+        post: document.getElementById('user-post').value,
+        base: document.getElementById('user-base').value,
+        clearance: document.getElementById('user-clearance').value
+    };
+
+    localStorage.setItem('astra_user_id', JSON.stringify(profileData));
+
+    const fields = ['user-id', 'user-name', 'user-post', 'user-base', 'user-clearance'];
+    fields.forEach(id => document.getElementById(id).disabled = true);
+
+    const editBtn = document.getElementById('toggle-edit-btn');
+    editBtn.innerText = '✎ Edit Personnel ID';
+    editBtn.className = 'btn-edit';
+    isEditing = false;
+
+    loadProfile();
+}
+
+// Load Personal Simulation History
+function loadSimulationHistory() {
+    const profile = JSON.parse(localStorage.getItem('astra_user_id') || '{"id":"IC-78219"}');
+    let history = JSON.parse(localStorage.getItem(`astra_history_${profile.id}`) || '[]');
+
+    if (history.length === 0) {
+        history = [
+            {
+                timestamp: '2026-05-09 14:22 IST',
+                mode: 'Expert',
+                location: 'Sector 4 - Eastern Ladakh',
+                capacity: '12 Personnel',
+                duration: '45 Days Deployment',
+                status: 'Completed'
+            },
+            {
+                timestamp: '2026-05-08 09:15 IST',
+                mode: 'Officer',
+                location: 'Siachen Glacier North Sector',
+                capacity: '8 Personnel',
+                duration: '14 Days Quick Deployment',
+                status: 'Completed'
+            }
+        ];
+
+        const latestSubmit = JSON.parse(localStorage.getItem('astra_sim_data') || '{}');
+        if (latestSubmit.mode) {
+            const now = new Date();
+            const dateStr = `${now.toISOString().split('T')[0]} ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} IST`;
+
+            history.unshift({
+                timestamp: dateStr,
+                mode: latestSubmit.mode,
+                location: latestSubmit.location || 'HACR Sector Base',
+                capacity: `${latestSubmit.capacity || '10'} Personnel`,
+                duration: latestSubmit.duration || '30 Days Tactical',
+                status: 'Active Session'
+            });
+        }
+
+        localStorage.setItem(`astra_history_${profile.id}`, JSON.stringify(history));
+    }
+
+    const tableBody = document.getElementById('history-rows');
+    tableBody.innerHTML = '';
+
+    history.forEach(item => {
+        let modeClass = 'mode-general';
+        if (item.mode.toLowerCase() === 'expert') modeClass = 'mode-expert';
+        if (item.mode.toLowerCase() === 'officer') modeClass = 'mode-officer';
+
+        
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="color: #94a3b8; font-family: monospace;">${item.timestamp}</td>
+            <td><span class="mode-tag ${modeClass}">${item.mode} Mode</span></td>
+            <td><strong>${item.location}</strong></td>
+            <td>${item.capacity}</td>
+            <td><span style="color: var(--accent-amber);">${item.duration}</span></td>
+            <td><span style="color: var(--accent-green); font-size: 0.8rem;">● ${item.status}</span></td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function clearUserHistory() {
+    const profile = JSON.parse(localStorage.getItem('astra_user_id') || '{"id":"IC-78219"}');
+    localStorage.removeItem(`astra_history_${profile.id}`);
+    loadSimulationHistory();
+}
+</script>
+
+</body>
+</html>

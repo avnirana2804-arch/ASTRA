@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to ASTRA - DRDO Portal</title>
+    <link rel="icon" type="image/png" href="logo-icon.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Dedicated Welcome Page Layout */
+        .welcome-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+            margin: 0 auto;
+            padding-bottom: 30px;
+        }
+
+        .hero-section {
+            text-align: center;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 35px;
+            border-radius: 20px;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            backdrop-filter: blur(12px);
+        }
+
+        .welcome-title {
+            font-size: 3.2rem;
+            color: #4cc9f0;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .auth-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .auth-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 35px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .auth-card h3 {
+            color: #4cc9f0;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(3, 7, 18, 0.8);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #4cc9f0;
+            box-shadow: 0 0 8px rgba(76, 201, 240, 0.4);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .info-block {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+        }
+
+        .info-block h4 {
+            color: #f72585;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .info-block p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .about-btn {
+            background: transparent;
+            border: 1px solid #4cc9f0;
+            color: #4cc9f0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .about-btn:hover {
+            background: rgba(76, 201, 240, 0.2);
+            box-shadow: 0 0 12px rgba(76, 201, 240, 0.3);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 15px;
+            margin-top: 8px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .team-grid li {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Modal Base Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #0f172a;
+            border: 1px solid rgba(76, 201, 240, 0.4);
+            box-shadow: 0 0 30px rgba(0, 180, 216, 0.3);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            text-align: left;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .modal-section-title {
+            color: #4cc9f0;
+            font-size: 1.1rem;
+            margin: 15px 0 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 4px;
+        }
+
+        .model-param-list {
+            color: #cbd5e1;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-left: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="welcome-wrapper">
+        <!-- Hero Header -->
+        <div class="hero-section">
+            <h1 class="welcome-title">Welcome to ASTRA</h1>
+            <p class="subtitle">Area Specific Thermal Resilience Analytics</p>
+            <p class="description" style="margin-top: 15px;">
+                A specialized defense simulation platform designed for High Altitude Command Regions (HACR) thermal comfort, structural resilience, and energy footprint optimization.
+            </p>
+        </div>
+
+        <!-- Authentication Cards Section -->
+        <div class="auth-container">
+            <!-- Login Callout Card -->
+            <div class="auth-card">
+                <h3>Already Registered?</h3>
+                <p style="color: #cbd5e1; font-size: 0.95rem; margin: 15px 0 25px 0; line-height: 1.6;">
+                    Access the portal using your military Personnel ID or official email credentials.
+                </p>
+                <button type="button" class="btn" onclick="openLoginModal()" style="width: 100%;">
+                    Login to Portal →
+                </button>
+            </div>
+
+            <!-- Sign Up Callout Card -->
+            <div class="auth-card">
+                <h3 style="color: #f72585;">New to ASTRA?</h3>
+                <p style="color: #cbd5e1; font-size: 0.95rem; margin: 15px 0 25px 0; line-height: 1.6;">
+                    Create your official account to gain role-based access for high-altitude thermal simulation and analytics.
+                </p>
+                <button type="button" class="btn" onclick="openSignupModal()" style="background: linear-gradient(135deg, #f72585, #b5179e); width: 100%;">
+                    Sign Up Now →
+                </button>
+            </div>
+        </div>
+
+        <!-- Information & Team Section -->
+        <div class="info-grid">
+            <!-- Interactive About Us Block -->
+            <div class="info-block">
+                <h4>About ASTRA Platform</h4>
+                <p>Software model for designing Area Specific Shelters to maintain thermal comfort in extreme high-altitude defense environments.</p>
+                <button class="about-btn" onclick="openAboutModal()">Read Full Overview & Parameters →</button>
+            </div>
+
+            <!-- Sponsoring Department Block -->
+            <div class="info-block">
+                <h4>Sponsoring Organisation</h4>
+                <p><strong>Defense Research & Development Organisation (DRDO)</strong></p>
+                <p style="margin-top: 8px;">Developing indigenous, software-backed thermal comfort models for troop shelters in HACR operational sectors.</p>
+                <button class="about-btn" onclick="openDrdoModal()">Learn More About DRDO →</button>
+            </div>
+
+            <!-- Team HimKavaach -->
+            <div class="info-block">
+                <h4>Development Team: HimKavaach</h4>
+                <ul class="team-grid">
+                    <li>🎖️ Avni Rana</li>
+                    <li>🎖️ Anshika Goswami</li>
+                    <li>🎖️ Chhavi</li>
+                    <li>🎖️ Deepanshi Bisht</li>
+                    <li>🎖️ Shreya Joshi</li>
+                    <li>🎖️ Vaishnavi Sharma</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal Popup -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px;">
+            <button class="modal-close" onclick="closeLoginModal()">&times;</button>
+            <h2 style="color: #4cc9f0; margin-bottom: 5px;">Portal Authentication</h2>
+            <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">Enter your Personnel ID or Email to proceed.</p>
+            
+            <form onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <label>Personnel ID or Email Address</label>
+                    <input 
+                        type="text" 
+                        placeholder="DRDO-1024 or user@domain.com" 
+                        pattern="^([A-Za-z]{3,4}-[0-9]{4}|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$" 
+                        title="Enter a valid Service ID (e.g., DRDO-1024) or Email" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-wrapper">
+                        <input 
+                            id="login-pass"
+                            type="password" 
+                            placeholder="••••••••" 
+                            minlength="8" 
+                            maxlength="8"
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&#]).{8,8}" 
+                            title="Must contain 8 characters (including 1 uppercase letter, 1 lowecase letter, 1 number and one special character)" 
+                            required
+                        >
+                        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('login-pass', this)">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Login to Portal →</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal Popup -->
+    <div id="signup-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 480px;">
+            <button class="modal-close" onclick="closeSignupModal()">&times;</button>
+            <h2 style="color: #f72585; margin-bottom: 5px;">Create ASTRA Account</h2>
+            <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">Enter your details to request authorization credentials.</p>
+            
+            <form onsubmit="handleModalRegistration(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" placeholder="e.g. Major R. Sharma" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input id="signup-email" type="email" placeholder="user@domain.com" required style="flex: 1;">
+                        <button type="button" class="btn" onclick="sendVerificationCode()" style="padding: 0 12px; font-size: 0.78rem; white-space: nowrap;">Send Code</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Verification Code</label>
+                    <input type="text" placeholder="Enter 6-digit code" pattern="^[0-9]{6}$" title="Enter 6-digit numeric code" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Set Password</label>
+                    <div class="password-wrapper">
+                        <input 
+                            id="modal-reg-pass"
+                            type="password" 
+                            placeholder="••••••••" 
+                            minlength="8" 
+                            max length="8"
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&#]).{8,8}" 
+                            title="Must contain 8 characters (including 1 uppercase letter, 1 lowecase letter, 1 number and one special character)" 
+                            required
+                        >
+                        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('modal-reg-pass', this)">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input 
+                            id="modal-reg-pass-confirm"
+                            type="password" 
+                            placeholder="••••••••" 
+                            required
+                        >
+                        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('modal-reg-pass-confirm', this)">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px; background: linear-gradient(135deg, #f72585, #b5179e);">
+                    Submit & Register →
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- About ASTRA Modal Popup -->
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAboutModal()">&times;</button>
+            <h2 style="color: #4cc9f0; margin-bottom: 5px;">ASTRA Architecture Overview</h2>
+            <p style="color: #94a3b8; font-size: 0.88rem;">Area Specific Thermal Resilience Analytics for HACR Environments</p>
+            
+            <div class="modal-section-title">Core Objective</div>
+            <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.6;">
+                ASTRA models high-altitude troop shelters to optimize heating efficiency, integrate Phase Change Materials (PCM), and drastically reduce kerosene fossil fuel dependency in extreme sub-zero operational sectors like Siachen and Ladakh.
+            </p>
+
+            <div class="modal-section-title">The 3-User Operational Models</div>
+            
+            <p style="color: #f72585; font-size: 0.9rem; font-weight: 500; margin-top: 8px;">1. Expert Mode (DRDO Scientists & Engineers)</p>
+            <ul class="model-param-list">
+                <li><strong>Configurable Parameters:</strong> FEA mesh density, composite layer thermal conductivities, PCM enthalpy curve overrides, numerical boundary conditions.</li>
+            </ul>
+
+            <p style="color: #00b4d8; font-size: 0.9rem; font-weight: 500; margin-top: 8px;">2. Officer Mode (Field Commanders & Logistics)</p>
+            <ul class="model-param-list">
+                <li><strong>Configurable Parameters:</strong> GIS map sector coordinates, automated NASA POWER weather API ingestion (solar irradiance, wind speed, ambient temp), troop capacity.</li>
+            </ul>
+
+            <p style="color: #4ade80; font-size: 0.9rem; font-weight: 500; margin-top: 8px;">3. General Mode (Fast Presets)</p>
+            <ul class="model-param-list">
+                <li><strong>Configurable Parameters:</strong> Preset shelter dimensions, standard troop occupancies (4/8/12-man tents), quick weather presets for rapid fuel consumption estimates.</li>
+            </ul>
+
+            <button class="btn" onclick="closeAboutModal()" style="margin-top: 20px; float: right;">Got It</button>
+        </div>
+    </div>
+
+    <!-- DRDO Information Modal Popup -->
+    <div id="drdo-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeDrdoModal()">&times;</button>
+            <h2 style="color: #f72585; margin-bottom: 5px;">Defense Research & Development Organisation</h2>
+            <p style="color: #94a3b8; font-size: 0.88rem;">Ministry of Defence | Government of India</p>
+            
+            <div class="modal-section-title">About DRDO</div>
+            <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.6;">
+                DRDO is the premier R&D wing of the Ministry of Defence, dedicated to empowering India with cutting-edge defense technologies and self-reliant indigenous military solutions.
+            </p>
+
+            <div class="modal-section-title">High-Altitude Defense Research Focus</div>
+            <ul class="model-param-list">
+                <li><strong>Extreme Environment Habitability:</strong> Designing passive and active thermal management systems for High Altitude Command Regions (HACR) like Siachen, Eastern Ladakh, and Tawang.</li>
+                <li><strong>Energy Footprint Optimization:</strong> Replacing heavy kerosene/diesel logistical transport with smart thermal storage, phase change materials (PCM), and high-fidelity numerical simulation models.</li>
+                <li><strong>Indigenous Software Solutions:</strong> Sponsoring platforms like ASTRA to give field commanders predictive climate modeling, thermal comfort analytics, and operational planning tools.</li>
+            </ul>
+
+            <button class="btn" onclick="closeDrdoModal()" style="margin-top: 20px; float: right; background: linear-gradient(135deg, #f72585, #b5179e);">Close Overview</button>
+        </div>
+    </div>
+
+    <script>
+        // Modal Handlers
+        function openLoginModal() { document.getElementById('login-modal').classList.add('active'); }
+        function closeLoginModal() { document.getElementById('login-modal').classList.remove('active'); }
+
+        function openSignupModal() { document.getElementById('signup-modal').classList.add('active'); }
+        function closeSignupModal() { document.getElementById('signup-modal').classList.remove('active'); }
+
+        function openAboutModal() { document.getElementById('about-modal').classList.add('active'); }
+        function closeAboutModal() { document.getElementById('about-modal').classList.remove('active'); }
+
+        function openDrdoModal() { document.getElementById('drdo-modal').classList.add('active'); }
+        function closeDrdoModal() { document.getElementById('drdo-modal').classList.remove('active'); }
+
+        // Close Modals when clicking dark backdrop
+        window.onclick = function(event) {
+            const modals = ['login-modal', 'signup-modal', 'about-modal', 'drdo-modal'];
+            modals.forEach(id => {
+                const el = document.getElementById(id);
+                if (event.target === el) el.classList.remove('active');
+            });
+        };
+
+        // Password Eye Visibility Toggle
+        function togglePasswordVisibility(inputId, btnElement) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            if (input.type === 'password') {
+                input.setAttribute('type', 'text');
+                btnElement.textContent = '🙈';
+            } else {
+                input.setAttribute('type', 'password');
+                btnElement.textContent = '👁️';
+            }
+        }
+
+        // Verification Code Simulation
+        function sendVerificationCode() {
+            const email = document.getElementById('signup-email').value;
+            if (!email) {
+                alert("Please enter your email address first.");
+                return;
+            }
+            alert("Verification code sent to " + email + "! (Simulated Code: 123456)");
+        }
+
+        // Authentication Redirections
+        function handleAuth(event) {
+            event.preventDefault();
+            window.location.href = 'welcome.html';
+        }
+
+        function handleModalRegistration(event) {
+            event.preventDefault();
+            const pass = document.getElementById('modal-reg-pass').value;
+            const confirmPass = document.getElementById('modal-reg-pass-confirm').value;
+
+            if (pass !== confirmPass) {
+                alert("Passwords do not match. Please verify your input.");
+                return;
+            }
+
+            window.location.href = 'welcome.html';
+        }
+    </script>
+</body>
+</html>

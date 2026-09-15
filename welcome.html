@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Leaflet GIS Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTRA - Area Specific Thermal Resilience Analytics</title>
+    <!-- Favicon icon for browser tab -->
+    <link rel="icon" type="image/png" href="logo-icon.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Top Live Status Bar -->
+<div class="status-bar">
+    <div class="status-item">
+        <span id="api-dot" class="pulse-dot"></span>
+        <span>NASA POWER API: <strong id="api-status" class="status-online">ONLINE</strong></span>
+    </div>
+    <div class="status-item">
+        <span>PyAnsys Engine: <strong class="status-ready">READY</strong></span>
+    </div>
+    
+    <!-- Emergency / Offline Mode Switch -->
+    <div class="status-item emergency-toggle-group">
+        <span class="toggle-label">Emergency/Offline Mode:</span>
+        <label class="switch">
+            <input type="checkbox" id="offline-switch" onchange="toggleOfflineMode(this)">
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <div class="status-item">
+        <span>System Time: <strong id="live-clock">--:--:-- IST</strong></span>
+    </div>
+</div>
+    <div class="container">
+        <!-- Header & Branding -->
+       <header>
+    <!-- Top Header Bar with Icon & Title -->
+    <div class="brand-header">
+        <img src="logo-icon.png" alt="ASTRA Icon" class="brand-icon">
+        <div class="brand-title-group">
+            <h1>ASTRA</h1>
+            <span class="dept-tag">Defense Research & Development Organisation (DRDO)</span>
+        </div>
+        <!-- User Profile / ID Icon Button -->
+    <div class="user-profile-badge" onclick="goToDashboard()" style="cursor: pointer;" title="User Profile & Dashboard">
+        🪪 <span class="user-id-text">ID: DRDO-XXXX</span>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4cc9f0" stroke-width="2">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+        <path d="M7 7h10M7 11h10M7 15h6"></path>
+        </svg>
+        
+    </div>
+    </div>
+
+    <p class="subtitle">Area Specific Thermal Resilience Analytics</p>
+
+    <p class="description">
+        A software-based model development for design of Area Specific Shelters for thermal comfort maintenance in extreme environments.
+    </p>
+</header>
+        <!-- Role Selection Cards -->
+        <main class="login-grid">
+            
+            <!-- Card 1: Expert Mode -->
+            <div class="card" onclick="openParamModal('expert-modal')">
+                <div class="info-icon" title="For DRDO Scientists & Thermal Engineers" onclick="openModal('expert')">i</div>
+                <div class="card-icon">🧪</div>
+                <h2>Expert Mode</h2>
+                <p>Full control over FEA mesh, custom material properties, and thermal parameter overrides.</p>
+                <button class="btn" onclick="selectRole('expert')" >Add Parameters →</button>
+            </div>
+
+            <!-- Card 2: Officer Mode -->
+            <div class="card" onclick="openParamModal('officer-modal')">
+                <div class="info-icon" title="For Field Commanders & Logistics Personnel" onclick="openModal('officer')">i</div>
+                <div class="card-icon">🛡️</div>
+                <h2>Officer Mode</h2>
+                <p>GIS map-based selection with automated NASA weather API climate ingestion.</p>
+                <button class="btn" onclick="selectRole('officer')">Add Parameters →</button>
+            </div>
+
+            <!-- Card 3: General Mode -->
+            <div class="card" onclick="openParamModal('general-modal')">
+                <div class="info-icon" title="For General Users & Fast Presets" onclick="openModal('general')">i</div>
+                <div class="card-icon">👤</div>
+                <h2>General Mode</h2>
+                <p>Quick operational presets for standard shelter configurations and troop capacities.</p>
+                <button class="btn" onclick="selectRole('general')">Add Parameters →</button>
+            </div>
+
+        </main>
+        <!-- Feature Highlights Bar -->
+            <div class="features-bar">
+               <div class="feature-pill">
+               <span class="pill-icon">📡</span>
+               <span>Automated NASA Climate Ingestion</span>
+               </div>
+               <div class="feature-pill">
+               <span class="pill-icon">🧱</span>
+               <span>PCM & Composite Materials Engine</span>
+               </div>
+               <div class="feature-pill">
+               <span class="pill-icon">📉</span>
+               <span>Fossil Fuel Offset Analytics</span>
+               </div>
+            </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Interactive Modal Backdrop & Window -->
+<div id="info-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <div class="modal-header">
+            <span id="modal-icon" class="modal-badge-icon">ℹ️</span>
+            <h2 id="modal-title">Role Title</h2>
+        </div>
+        <p id="modal-desc" class="modal-body-text">Description content goes here.</p>
+        <div class="modal-footer">
+            <button class="btn modal-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- EXPERT MODE PARAMETER MODAL -->
+<div id="expert-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeParamModal('expert-modal')">&times;</button>
+        <h2 style="color: #f72585; margin-bottom: 5px;">Expert Mode Parameters & Material Physics</h2>
+        <p style="color: #94a3b8; font-size: 0.88rem;">Specify material layers, thermal conductivities, phase-change properties, and FEA mesh parameters.</p>
+
+        <form class="modal-form" onsubmit="handleParamSubmit(event, 'Expert')">
+            <div class="modal-section-heading">1. Deployment & Site Specifications</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Target Sector / Coordinates</label>
+                    <input type="text" placeholder="e.g. Siachen Base Camp (35.2° N, 77.1° E)" required>
+                </div>
+                <div class="form-group">
+                    <label>Altitude Above Sea Level (m)</label>
+                    <input type="number" placeholder="e.g. 5400" min="0" max="9000" required>
+                </div>
+            </div>
+
+            <div class="modal-section-heading">2. Climate & Troop Logistics</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Ambient Outside Temp (°C)</label>
+                    <input type="number" placeholder="e.g. -35" max="50" min="-60" required>
+                </div>
+                <div class="form-group">
+                    <label>Target Indoor Comfort Temp (°C)</label>
+                    <input type="number" value="18" max="30" min="5" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Troop Capacity (Occupants)</label>
+                    <input type="number" placeholder="e.g. 10" min="1" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label>Deployment Duration (Days)</label>
+                    <input type="number" placeholder="e.g. 45" min="1" max="365" required>
+                </div>
+            </div>
+
+            <div class="modal-section-heading">3. Structural Layers & Material Properties</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Outer Shell Material</label>
+                    <select required>
+                        <option value="carbon-aramid">Carbon-Aramid Weather Shield</option>
+                        <option value="ptfe-coated-glass">PTFE-Coated Fiberglass Fabric</option>
+                        <option value="ripstop-nylon">High-Density Ripstop Kevlar Nylon</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Outer Layer Thermal Conductivity (W/m. K)</label>
+                    <input type="number" step="0.001" placeholder="e.g. 0.045" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Core Insulation Material</label>
+                    <select required>
+                        <option value="aerogel-pu">Aerogel-Infused Polyurethane Core</option>
+                        <option value="vip-panel">Vacuum Insulated Panel (VIP Matrix)</option>
+                        <option value="expanded-polystyrene">High-Density Expanded Polystyrene</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Core Layer Thermal Conductivity (W/m.K)</label>
+                    <input type="number" step="0.001" placeholder="e.g. 0.015" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phase Change Material (PCM) Integration</label>
+                    <select required>
+                        <option value="bio-paraffin">Organic Bio-Paraffin (Melting Pt: 18°C)</option>
+                        <option value="salt-hydrate">Inorganic Salt Hydrate (Melting Pt: 21°C)</option>
+                        <option value="form-stable">Form-Stable Encapsulated PCM Composite</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>PCM Latent Heat Capacity (kJ/kg)</label>
+                    <input type="number" step="0.1" placeholder="e.g. 230.5" required>
+                </div>
+            </div>
+
+            <div class="modal-section-heading">4. Physics Numerical Mesh</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>PCM Layer Thickness (mm)</label>
+                    <input type="number" placeholder="e.g. 15" min="1" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label>FEA Mesh Density (Nodes/m^3)</label>
+                    <input type="number" placeholder="e.g. 50000" min="1000" max="500000" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 15px; background: linear-gradient(135deg, #f72585, #b5179e);">
+                Execute High-Fidelity FEA Simulation →
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- OFFICER MODE PARAMETER MODAL -->
+<div id="officer-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeParamModal('officer-modal')">&times;</button>
+        <h2 style="color: #00b4d8; margin-bottom: 5px;">Officer Mode Parameters & GIS Mapping</h2>
+        <p style="color: #94a3b8; font-size: 0.88rem;">Select map coordinates, deployment parameters, and material selection or enable ASTRA AI material recommendations.</p>
+
+        <!-- GIS Interactive Map Viewport -->
+        <div class="modal-section-heading">1. Interactive Sector Selection (GIS)</div>
+        <div id="officer-map" style="height: 220px; width: 100%; border-radius: 12px; border: 1px solid rgba(76, 201, 240, 0.4); margin: 10px 0 15px 0;"></div>
+
+        <form class="modal-form" onsubmit="handleParamSubmit(event, 'Officer')">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Deployment Sector / Coordinates</label>
+                    <input id="officer-coords" type="text" placeholder="Click map or type (e.g. 34.1526° N, 77.5771° E)" required>
+                </div>
+                <div class="form-group">
+                    <label>Sector Altitude (Meters MSL)</label>
+                    <input type="number" placeholder="e.g. 4300" min="0" max="9000" required>
+                </div>
+            </div>
+
+            <div class="modal-section-heading">2. Climate & Troop Logistics</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Expected Min Ambient Temp (°C)</label>
+                    <input type="number" placeholder="e.g. -25" required>
+                </div>
+                <div class="form-group">
+                    <label>Required Shelter Temp (°C)</label>
+                    <input type="number" value="18" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Troop Station Capacity</label>
+                    <input type="number" placeholder="e.g. 12" min="1" max="200" required>
+                </div>
+                <div class="form-group">
+                    <label>Mission Duration (Days)</label>
+                    <input type="number" placeholder="e.g. 60" min="1" required>
+                </div>
+            </div>
+
+            <div class="modal-section-heading">3. Shelter Material Selection</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Outer & Core Layer Material</label>
+                    <select required>
+                        <option value="auto">✨ Auto-Recommend (ASTRA Simulation Advice)</option>
+                        <option value="aerogel-pu">Aerogel-Infused Polyurethane Composite</option>
+                        <option value="vip-panel">Vacuum Insulated Panel (VIP Matrix)</option>
+                        <option value="carbon-aramid">Carbon-Aramid Weather Shield</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Phase Change Material (PCM)</label>
+                    <select required>
+                        <option value="auto">✨ Auto-Recommend (ASTRA Simulation Advice)</option>
+                        <option value="bio-paraffin">Organic Bio-Paraffin Matrix (18°C)</option>
+                        <option value="salt-hydrate">Inorganic Salt Hydrate (21°C)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>NASA POWER Climate Ingestion Source</label>
+                <select required>
+                    <option value="live">Live Satellite Stream (Solar Irradiance + Wind Velocity)</option>
+                    <option value="cached">Cached High-Altitude Winter Extreme Records</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">
+                Run GIS Thermal Logistics Optimization →
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- GENERAL MODE PARAMETER MODAL -->
+<div id="general-modal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeParamModal('general-modal')">&times;</button>
+        <h2 style="color: #4ade80; margin-bottom: 5px;">General Mode Presets</h2>
+        <p style="color: #94a3b8; font-size: 0.88rem;">Quick setup for standard shelter models, temperature thresholds, fuel estimates, and material presets.</p>
+
+        <form class="modal-form" onsubmit="handleParamSubmit(event, 'General')">
+            <div class="modal-section-heading">1. Location & Shelter Preset</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Region / Post Location</label>
+                    <input type="text" placeholder="e.g. Dras Sector" required>
+                </div>
+                <div class="form-group">
+                    <label>Shelter Structure Preset</label>
+                    <select required>
+                        <option value="4-man">4-Man High-Altitude Tent</option>
+                        <option value="8-man">8-Man Insulated Bunker Shelter</option>
+                        <option value="12-man">12-Man Modular Composite Barracks</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-section-heading">2. Temperature & Station Parameters</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Ambient Outside Temp (°C)</label>
+                    <input type="number" placeholder="e.g. -20" required>
+                </div>
+                <div class="form-group">
+                    <label>Target Indoor Temp (°C)</label>
+                    <input type="number" value="18" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Troop Occupants</label>
+                    <input type="number" placeholder="e.g. 8" min="1" max="50" required>
+                </div>
+                <div class="form-group">
+                    <label>Operation Period (Days)</label>
+                    <input type="number" placeholder="e.g. 15" min="1" required>
+                </div>
+            </div>
+
+            <div class="modal-section-heading">3. Structural Material Configuration</div>
+            <div class="form-group">
+                <label>Insulation & PCM Material Option</label>
+                <select required>
+                    <option value="auto">✨ Auto-Recommend Material Strategy (ASTRA Advice)</option>
+                    <option value="std-canvas">Standard Canvas Shelter (Legacy / No PCM)</option>
+                    <option value="pcm-lite">PCM-Integrated Lightweight Composite Liner</option>
+                    <option value="ultra-hacr">Ultra-HACR Multi-Layer PCM Composite Panel</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 15px; background: linear-gradient(135deg, #4ade80, #059669);">
+                Generate Quick Energy Profile →
+            </button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

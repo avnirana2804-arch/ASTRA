@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTRA - Expert Simulation Workbench</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            cursor: grab;
+        }
+        .canvas-container:active {
+            cursor: grabbing;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </a>
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-cubes-stacked text-cyan-400 text-xl"></i>
+                <h1 class="text-xl font-bold tracking-wide text-white">ASTRA <span class="text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded ml-2">EXPERT MODE</span></h1>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="text-right hidden sm:block">
+                <p class="text-xs text-slate-400">AUTHENTICATED PERSONNEL</p>
+                <p id="active-user-badge" class="text-sm font-mono font-bold text-amber-400">DRDO-8492</p>
+            </div>
+            <a href="dashboard.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-sm border border-slate-700 transition-colors flex items-center space-x-2">
+                <i class="fa-solid fa-chart-line text-cyan-400"></i>
+                <span>Dashboard</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workbench Area -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 p-6 max-w-[1800px] w-full mx-auto">
+
+        <!-- Left Column: Mission Spec, Material Descriptions & Subsystems -->
+        <div class="lg:col-span-1 space-y-6 flex flex-col">
+            
+            <!-- Dynamic Deployment Parameters Card -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+                    <span><i class="fa-solid fa-sliders text-cyan-400 mr-2"></i>Active Deployment Spec</span>
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
+                </h2>
+                
+                <div class="space-y-3 font-mono text-sm">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                        <span class="text-slate-400">Deployment Site:</span>
+                        <span id="summary-location" class="font-semibold text-white">Sector 4 - Ladakh</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                        <span class="text-slate-400">Occupancy Capacity:</span>
+                        <span id="summary-capacity" class="font-semibold text-cyan-400">12 Personnel</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                        <span class="text-slate-400">Ambient Temp:</span>
+                        <span id="summary-ambient" class="font-semibold text-rose-400">-28 °C</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                        <span class="text-slate-400">Internal Target:</span>
+                        <span id="summary-target" class="font-semibold text-emerald-400">+18 °C</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-slate-400">Operation Duration:</span>
+                        <span id="summary-duration" class="font-semibold text-amber-400">45 Days Deployment</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Material & Layer Specification Description Panel -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-lg space-y-3">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                    <span><i class="fa-solid fa-layer-group text-amber-400 mr-2"></i>Material Layer Specs</span>
+                    <span class="text-xs text-slate-500 font-mono">4-LAYER COMPOSITE</span>
+                </h2>
+
+                <div class="space-y-2 text-xs">
+                    <div class="p-2.5 rounded bg-slate-800/60 border-l-4 border-cyan-400">
+                        <div class="flex justify-between font-bold text-slate-200 mb-1">
+                            <span>Layer 1: Outer Shell</span>
+                            <span class="font-mono text-cyan-400">5mm</span>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">High-impact Carbon-Aramid composite engineered for wind shear defense (>180 km/h) and UV degradation protection.</p>
+                    </div>
+
+                    <div class="p-2.5 rounded bg-slate-800/60 border-l-4 border-pink-500">
+                        <div class="flex justify-between font-bold text-slate-200 mb-1">
+                            <span>Layer 2: Thermal Core</span>
+                            <span class="font-mono text-pink-400">12mm</span>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Phase Change Material (PCM) polymer matrix absorbing latent thermal energy during solar peak for release at night.</p>
+                    </div>
+
+                    <div class="p-2.5 rounded bg-slate-800/60 border-l-4 border-amber-400">
+                        <div class="flex justify-between font-bold text-slate-200 mb-1">
+                            <span>Layer 3: Vacuum Insulation</span>
+                            <span class="font-mono text-amber-400">25mm</span>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Silica Aerogel vacuum insulation panel delivering R-42 thermal resistance against extreme arctic ambient chill.</p>
+                    </div>
+
+                    <div class="p-2.5 rounded bg-slate-800/60 border-l-4 border-emerald-400">
+                        <div class="flex justify-between font-bold text-slate-200 mb-1">
+                            <span>Layer 4: Living Frame</span>
+                            <span class="font-mono text-emerald-400">30mm</span>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Structural Aluminium-Lithium alloy skeleton integrated with anti-microbial interior comfort coating.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shelter Subsystems Panel -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-lg space-y-3">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-microchip text-emerald-400 mr-2"></i>Shelter Subsystems</span>
+                    <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">ONLINE</span>
+                </h2>
+
+                <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400">HVAC Thermal Unit</p>
+                        <p id="hvac-status" class="text-xs font-bold font-mono text-emerald-400">2.4 kW Heat Pump Active</p>
+                    </div>
+                    <i class="fa-solid fa-temperature-arrow-up text-amber-400 text-lg"></i>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400">PCM Thermal Reservoir</p>
+                        <p class="text-xs font-bold font-mono text-pink-400">Phase Latent Heat: 88%</p>
+                    </div>
+                    <i class="fa-solid fa-charging-station text-pink-400 text-lg"></i>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400">Airlock Vestibule</p>
+                        <p class="text-xs font-bold font-mono text-cyan-400">Seal Pressure: 1.02 atm</p>
+                    </div>
+                    <i class="fa-solid fa-door-closed text-cyan-400 text-lg"></i>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/60 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400">Aerogel Insulation Efficiency</p>
+                        <p class="text-xs font-bold font-mono text-amber-400">R-Value: 42 m²·K/W</p>
+                    </div>
+                    <i class="fa-solid fa-shield text-amber-400 text-lg"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Interactive 3D Canvas -->
+        <div class="lg:col-span-3 flex flex-col space-y-4">
+            
+            <div class="canvas-container flex-1 min-h-[640px] relative">
+                
+                <!-- View Controls Overlay -->
+                <div class="absolute top-4 left-4 z-10 flex space-x-2">
+                    <button onclick="toggleExplodedView()" id="explode-btn" class="bg-slate-900/90 hover:bg-slate-800 text-amber-400 border border-amber-500/40 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-burst"></i>
+                        <span>💥 Explode Structural Layers</span>
+                    </button>
+                    <button onclick="toggleMaterialLabels()" id="labels-btn" class="bg-slate-900/90 hover:bg-slate-800 text-cyan-400 border border-cyan-500/40 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-tags"></i>
+                        <span>Toggle Material Specifications</span>
+                    </button>
+                </div>
+
+                <!-- Controls Instructions -->
+                <div class="absolute top-4 right-4 z-10 bg-slate-900/80 border border-slate-800 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs font-mono text-slate-400 flex items-center space-x-2 pointer-events-none">
+                    <i class="fa-solid fa-mouse text-cyan-400"></i>
+                    <span>Scroll to Zoom | Drag to Rotate</span>
+                </div>
+
+                <canvas id="canvas-3d"></canvas>
+
+                <!-- Status Banner -->
+                <div class="absolute bottom-4 left-4 z-10 bg-slate-900/80 border border-slate-800 backdrop-blur-sm px-4 py-2 rounded-lg text-xs font-mono text-slate-300 flex items-center space-x-3">
+                    <span class="flex h-2 w-2 relative">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span>3D Shelter Physics Engine: Multi-Layer Material Analysis Active</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- JavaScript Engine -->
+    <script>
+    let canvas, ctx;
+    let angleX = 0.4, angleY = 0.6;
+    let zoomLevel = 1.0; 
+    let isDragging = false, lastMouseX = 0, lastMouseY = 0;
+    let isExploded = false;
+    let explosionProgress = 0;
+    let showLabels = true;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const activeUser = JSON.parse(localStorage.getItem('astra_active_user')) || { personnelId: 'DRDO-8492' };
+        document.getElementById('active-user-badge').innerText = activeUser.personnelId;
+
+        const simData = JSON.parse(localStorage.getItem('astra_sim_data')) || {
+            location: 'Sector 4 - Eastern Ladakh',
+            capacity: '12',
+            ambientTemp: '-28',
+            targetTemp: '18',
+            duration: '45 Days Deployment'
+        };
+
+        const locEl = document.getElementById('summary-location');
+        const capEl = document.getElementById('summary-capacity');
+        const ambEl = document.getElementById('summary-ambient');
+        const tarEl = document.getElementById('summary-target');
+        const durEl = document.getElementById('summary-duration');
+
+        if (locEl) locEl.innerText = simData.location;
+        if (capEl) capEl.innerText = simData.capacity.includes('Personnel') ? simData.capacity : `${simData.capacity} Personnel`;
+        if (ambEl) ambEl.innerText = simData.ambientTemp.includes('°C') ? simData.ambientTemp : `${simData.ambientTemp} °C`;
+        if (tarEl) tarEl.innerText = simData.targetTemp.includes('°C') ? simData.targetTemp : `+${simData.targetTemp} °C`;
+        if (durEl) durEl.innerText = simData.duration;
+
+        canvas = document.getElementById('canvas-3d');
+        ctx = canvas.getContext('2d');
+        resizeCanvas();
+
+        canvas.addEventListener('mousedown', e => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+        
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            angleY += (e.clientX - lastMouseX) * 0.008;
+            angleX += (e.clientY - lastMouseY) * 0.008;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomLevel = Math.min(zoomLevel + 0.1, 2.5);
+            } else {
+                zoomLevel = Math.max(zoomLevel - 0.1, 0.4);
+            }
+        }, { passive: false });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        requestAnimationFrame(render3DScene);
+    });
+
+    function resizeCanvas() {
+        if (!canvas) return;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+
+    function toggleExplodedView() {
+        isExploded = !isExploded;
+        const btn = document.getElementById('explode-btn');
+        btn.innerHTML = isExploded ? 
+            '<i class="fa-solid fa-compress"></i><span>🧩 Reassemble Shelter Layers</span>' : 
+            '<i class="fa-solid fa-burst"></i><span>💥 Explode Structural Layers</span>';
+    }
+
+    function toggleMaterialLabels() {
+        showLabels = !showLabels;
+    }
+
+    function project3D(x, y, z) {
+        x *= zoomLevel;
+        y *= zoomLevel;
+        z *= zoomLevel;
+
+        let y1 = y * Math.cos(angleX) - z * Math.sin(angleX);
+        let z1 = y * Math.sin(angleX) + z * Math.cos(angleX);
+
+        let x2 = x * Math.cos(angleY) + z1 * Math.sin(angleY);
+        let z2 = -x * Math.sin(angleY) + z1 * Math.cos(angleY);
+
+        const fov = 380;
+        const scale = fov / (fov + z2 + 250);
+        return { x: canvas.width / 2 + x2 * scale, y: canvas.height / 2 + y1 * scale };
+    }
+
+    function render3DScene() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const targetExplosion = isExploded ? 1 : 0;
+        explosionProgress += (targetExplosion - explosionProgress) * 0.08;
+
+        const layers = [
+            { name: "Layer 4: Living Frame (Al-Li Alloy)", thick: "30mm", width: 100, height: 70, depth: 100, color: "rgba(74, 222, 128, 0.35)", stroke: "#4ade80", exp: 0 },
+            { name: "Layer 3: Aerogel Panel (Vacuum Insulation)", thick: "25mm", width: 130, height: 90, depth: 130, color: "rgba(251, 191, 36, 0.25)", stroke: "#fbbf24", exp: 40 },
+            { name: "Layer 2: PCM Core (Phase Change Polymer)", thick: "12mm", width: 160, height: 110, depth: 160, color: "rgba(247, 37, 133, 0.20)", stroke: "#f72585", exp: 80 },
+            { name: "Layer 1: Outer Shell (Carbon-Aramid)", thick: "5mm", width: 190, height: 130, depth: 190, color: "rgba(76, 201, 240, 0.12)", stroke: "#4cc9f0", exp: 120 }
+        ];
+
+        layers.forEach(l => {
+            const currentExp = l.exp * explosionProgress;
+            drawWireframeCube(l.width + currentExp, l.height + currentExp, l.depth + currentExp, l.color, l.stroke, l.name, l.thick);
+        });
+
+        if (explosionProgress < 0.6) {
+            drawTacticalAirlock();
+            drawObservationPort();
+            drawDimensionOverlay();
+        }
+
+        requestAnimationFrame(render3DScene);
+    }
+
+    function drawWireframeCube(w, h, d, fillColor, strokeColor, label, thick) {
+        const hw = w / 2, hh = h / 2, hd = d / 2;
+
+        const vertices = [
+            project3D(-hw, -hh, -hd), project3D(hw, -hh, -hd),
+            project3D(hw, hh, -hd),   project3D(-hw, hh, -hd),
+            project3D(-hw, -hh, hd),  project3D(hw, -hh, hd),
+            project3D(hw, hh, hd),    project3D(-hw, hh, hd)
+        ];
+
+        const faces = [
+            [0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4],
+            [2, 3, 7, 6], [0, 3, 7, 4], [1, 2, 6, 5]
+        ];
+
+        faces.forEach(f => {
+            ctx.beginPath();
+            ctx.moveTo(vertices[f[0]].x, vertices[f[0]].y);
+            ctx.lineTo(vertices[f[1]].x, vertices[f[1]].y);
+            ctx.lineTo(vertices[f[2]].x, vertices[f[2]].y);
+            ctx.lineTo(vertices[f[3]].x, vertices[f[3]].y);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        });
+
+        if (showLabels && (explosionProgress > 0.3 || label.includes("Outer Shell"))) {
+            const topNode = vertices[2];
+            ctx.fillStyle = strokeColor;
+            ctx.font = "bold 11px Segoe UI, sans-serif";
+            ctx.fillText(`${label} [${thick}]`, topNode.x + 8, topNode.y - 8);
+        }
+    }
+
+    function drawTacticalAirlock() {
+        const z = 95;
+        const extZ = z + 35;
+        const ev1 = project3D(-25, 0, extZ), ev2 = project3D(25, 0, extZ);
+        const ev3 = project3D(25, 65, extZ), ev4 = project3D(-25, 65, extZ);
+
+        ctx.beginPath();
+        ctx.moveTo(ev1.x, ev1.y); ctx.lineTo(ev2.x, ev2.y);
+        ctx.lineTo(ev3.x, ev3.y); ctx.lineTo(ev4.x, ev4.y);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
+        ctx.fill();
+        ctx.strokeStyle = "#4cc9f0";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#4cc9f0";
+        ctx.font = "bold 10px monospace";
+        ctx.fillText("🚪 AIRLOCK ENTRY (1.2m x 2.1m)", ev1.x - 20, ev1.y - 8);
+    }
+
+    function drawObservationPort() {
+        const x = 95;
+        const w1 = project3D(x, -25, -20), w2 = project3D(x, -25, 20);
+        const w3 = project3D(x, 15, 20),   w4 = project3D(x, 15, -20);
+
+        ctx.beginPath();
+        ctx.moveTo(w1.x, w1.y); ctx.lineTo(w2.x, w2.y);
+        ctx.lineTo(w3.x, w3.y); ctx.lineTo(w4.x, w4.y);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(251, 191, 36, 0.6)";
+        ctx.fill();
+        ctx.strokeStyle = "#fbbf24";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+
+    function drawDimensionOverlay() {
+        const pLengthStart = project3D(-95, 75, 95);
+        const pLengthEnd = project3D(95, 75, 95);
+        
+        const pHeightStart = project3D(-105, -65, 95);
+        const pHeightEnd = project3D(-105, 65, 95);
+
+        ctx.strokeStyle = "#fbbf24";
+        ctx.fillStyle = "#fbbf24";
+        ctx.lineWidth = 1.5;
+        ctx.font = "bold 11px monospace";
+
+        // Length Dimension Line
+        ctx.beginPath();
+        ctx.moveTo(pLengthStart.x, pLengthStart.y + 12);
+        ctx.lineTo(pLengthEnd.x, pLengthEnd.y + 12);
+        ctx.stroke();
+        ctx.fillText("📏 LENGTH: 6.0m", (pLengthStart.x + pLengthEnd.x) / 2 - 40, pLengthStart.y + 26);
+
+        // Height Dimension Line
+        ctx.beginPath();
+        ctx.moveTo(pHeightStart.x - 12, pHeightStart.y);
+        ctx.lineTo(pHeightEnd.x - 12, pHeightEnd.y);
+        ctx.stroke();
+        ctx.fillText("📐 HEIGHT: 3.5m", pHeightStart.x - 100, (pHeightStart.y + pHeightEnd.y) / 2);
+    }
+    </script>
+</body>
+</html>
